@@ -8,6 +8,7 @@ var Class = function() {
 // TODO: mache Geschwindigkeit abhängig von Masse!
 // TODO: Anziehungskraft!
 // TODO: mache Einsaugen nicht direkt bei Kollision
+// TODO: fix canvas size
 
 // Stage class
 var Stage = Class();
@@ -83,7 +84,7 @@ Stage.prototype = {
 // Blob class
 var Blob = Class();
 Blob.prototype = {
-    constructor: function(x, y, mass, color, vX, vY) {
+    constructor: function(x, y, mass, color, vX, vY, config) {
         this.radius = mass * 0.6;
         this.mass = mass;
         this.color = color;
@@ -92,6 +93,7 @@ Blob.prototype = {
         this.y = y;
         this.vX = vX;
         this.vY = vY;
+        this.config = config;
     },
     draw: function() {
         if (this.stage == null ) {
@@ -107,7 +109,7 @@ Blob.prototype = {
     update: function() {
         this.x += this.vX;
         this.y += this.vY;
-        this.radius = this.mass * 0.6;
+        this.radius = this.mass * this.config.blobsize;
         //console.log(this.radius);
     },
     checkBoundaryCollision: function() {
@@ -132,15 +134,28 @@ Blob.prototype = {
     }
 };
 
+var Config = Class();
+Config.prototype = {
+  constructor: function() {
+    this.enemies = 200;
+    this.difficulty = "easy";
+    this.fieldsize = 1000;
+    this.blobsize = 0.6;
+  }
+}
+
 // main function
 window.addEventListener("load", function() {
     var stage = new Stage("canvas","#ccc",60);
-    var blob = new Blob(50,50,50,"#000",-1,-1);
-    stage.addChild(blob);
-    var enemy = new Blob(100,100,20,"#000",1,1);
-    stage.addChild(enemy);
-    var enemy2 = new Blob(150,150,70,"#000",2,1);
-    stage.addChild(enemy2);
+    var config = new Config();
+    for (var i = 0; i < config.enemies; i++) {
+      var x = 20 + (Math.random() * (400 ));
+      var y = 20 + (Math.random() * (400 ));
+      var mass = 5 + Math.random() * 10;
+      var vX = Math.random() * 4 - 2;
+      var vY = Math.random() * 4 - 2;
+      stage.addChild(new Blob(x, y, mass, "#ccc", vX, vY, config));
+    }
     stage.rendering();
     }
 );
